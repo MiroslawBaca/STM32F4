@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <core_cm4.h>
 #include <stdio.h>
+#include <delay.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,6 +57,18 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// Tick counter
+//TU BYLO volatile uint64_t ticks;
+//extern uint64_t ticks;
+/** SysTick Interrupt Handler */
+// TU BYLO void SysTick_Handler(void) {ticks++;}
+
+/**
+ * Delays execution for a given number of milliseconds
+ */
+
+// TU BYło void msDelay(uint64_t ms) {}
+
 /* USER CODE END 0 */
 
 /**
@@ -87,8 +100,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  /* USER CODE BEGIN 2 */
 
+  /* USER CODE BEGIN 2 */
+  extern void unit_testing_example(void); // To ma na celu usunięcie ostrzeżenia kompilatora o braku deklaracji tej funkcji (nie zrobiliśmy jej nagłowka)
+  unit_testing_example();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -96,8 +111,11 @@ int main(void)
   while (1)
   {
 	  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-	  HAL_Delay(500);
-	  printf("Tick: %lu\n", HAL_GetTick());
+	  //HAL_Delay(500);
+	  msDelay(1000);
+	  uint64_t ticks = msGetTicks();
+	  printf("Tick: %d\n", (int)ticks);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
