@@ -24,6 +24,7 @@
 #include <core_cm4.h>
 #include <stdio.h>
 #include <delay.h>
+#include <event_manager.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,6 +57,33 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+
+
+/* USER CODE BEGIN 0 */
+
+Event ledRedEvent, ledGreenEvent;
+
+void ledRedEventHandler(struct Event* event, uint64_t scheduledTime, void* context) {
+    // toggle pin state
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    // reschedule this event after 500ms
+    EVENT_MANAGER_ScheduleEvent(event, scheduledTime + 500);
+}
+
+void ledGreenEventHandler(struct Event* event, uint64_t scheduledTime, void* context) {
+    // toggle pin state
+    HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+    // reschedule this event after 700ms
+    EVENT_MANAGER_ScheduleEvent(event, scheduledTime + 700);
+}
+
+/* USER CODE END 0 */
+
+
+
+
 
 // Tick counter
 //TU BYLO volatile uint64_t ticks;
@@ -102,13 +130,41 @@ int main(void)
   MX_GPIO_Init();
 
   /* USER CODE BEGIN 2 */
-  extern void unit_testing_example(void); // To ma na celu usunięcie ostrzeżenia kompilatora o braku deklaracji tej funkcji (nie zrobiliśmy jej nagłowka)
-  unit_testing_example();
+
+
+
+  /* USER CODE BEGIN 2 */
+
+  // Initialize event manager
+  EVENT_MANAGER_Init();
+  // Register events
+  EVENT_MANAGER_RegisterEvent(&ledRedEvent, ledRedEventHandler, NULL);
+  EVENT_MANAGER_RegisterEvent(&ledGreenEvent, ledGreenEventHandler, NULL);
+  // Schedule the events to execute immediately
+  EVENT_MANAGER_ScheduleEvent(&ledRedEvent, msGetTicks());
+  EVENT_MANAGER_ScheduleEvent(&ledGreenEvent, msGetTicks());
+
+  /* USER CODE END 2 */
+
+
+
+  //extern void unit_testing_example(void); // To ma na celu usunięcie ostrzeżenia kompilatora o braku deklaracji tej funkcji (nie zrobiliśmy jej nagłowka)
+  //unit_testing_example();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
+  {
+    // Process the events
+    EVENT_MANAGER_Proc(msGetTicks());
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
+
+  /*while (1)
   {
 	  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 	  //HAL_Delay(500);
@@ -116,10 +172,10 @@ int main(void)
 	  uint64_t ticks = msGetTicks();
 	  printf("Tick: %d\n", (int)ticks);
 
-    /* USER CODE END WHILE */
+    // USER CODE END WHILE
 
-    /* USER CODE BEGIN 3 */
-  }
+    // USER CODE BEGIN 3
+  }*/
   /* USER CODE END 3 */
 }
 
