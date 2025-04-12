@@ -1,0 +1,2 @@
+# STM32F4
+STM32F4 (STM32F429ZIT6) project implemented in STM32CubeIDE
