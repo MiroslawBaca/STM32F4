@@ -81,24 +81,6 @@ void ledGreenEventHandler(struct Event* event, uint64_t scheduledTime, void* con
 
 /* USER CODE END 0 */
 
-
-
-
-
-// Tick counter
-//TU BYLO volatile uint64_t ticks;
-//extern uint64_t ticks;
-/** SysTick Interrupt Handler */
-// TU BYLO void SysTick_Handler(void) {ticks++;}
-
-/**
- * Delays execution for a given number of milliseconds
- */
-
-// TU BYło void msDelay(uint64_t ms) {}
-
-/* USER CODE END 0 */
-
 /**
   * @brief  The application entry point.
   * @retval int
@@ -128,7 +110,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-
   /* USER CODE BEGIN 2 */
 
 
@@ -144,12 +125,15 @@ int main(void)
   EVENT_MANAGER_ScheduleEvent(&ledRedEvent, msGetTicks());
   EVENT_MANAGER_ScheduleEvent(&ledGreenEvent, msGetTicks());
 
-  /* USER CODE END 2 */
 
 
 
-  //extern void unit_testing_example(void); // To ma na celu usunięcie ostrzeżenia kompilatora o braku deklaracji tej funkcji (nie zrobiliśmy jej nagłowka)
-  //unit_testing_example();
+  //TESTY DLA USART:
+  USART_Init();
+  USART_PutChar('O');
+  USART_PutChar('K');
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -162,20 +146,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
-
-  /*while (1)
-  {
-	  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-	  //HAL_Delay(500);
-	  msDelay(1000);
-	  uint64_t ticks = msGetTicks();
-	  printf("Tick: %d\n", (int)ticks);
-
-    // USER CODE END WHILE
-
-    // USER CODE BEGIN 3
-  }*/
   /* USER CODE END 3 */
 }
 

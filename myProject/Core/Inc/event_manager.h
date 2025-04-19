@@ -17,10 +17,11 @@ typedef void (*OnEventHandler)(struct Event* event, uint64_t scheduledTime, void
 
 /// Event descriptor
 typedef struct Event {
-	bool isScheduled;			//< Flag stating if the event is scheduled (true) or not (false)
-	uint64_t scheduledTime;		//< Time at which the event is scheduled
-	OnEventHandler onEvent;		//< Pointer to user handler function
-	void* context;				//< Pointer to user context data
+    bool isScheduled;           //< Flag stating if the event is scheduled (true) or not (false)
+    uint64_t scheduledTime;     //< Time at which the event is scheduled
+    OnEventHandler onEvent;     //< Pointer to user handler function
+    void* context;              //< Pointer to user context data
+    struct Event* next;         //< Pointer to the next element in the list
 } Event;
 
 
