@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <delay.h>
 #include <event_manager.h>
+#include <usart.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,6 +80,42 @@ void ledGreenEventHandler(struct Event* event, uint64_t scheduledTime, void* con
     EVENT_MANAGER_ScheduleEvent(event, scheduledTime + 700);
 }
 
+// TESTY USART
+void USART_StressTest(void)
+{
+    size_t i;
+    uint32_t checksum;
+    char c;
+
+    // initialize USART
+    USART_Init();
+
+    while (1) {
+        // reset variables
+        i = 0;
+        checksum = 0;
+
+        // wait for 10kB of data
+        while (i < 10*1024) {
+            if (USART_GetChar(&c)) {
+                // if character has been received, calculate the checksum
+                checksum += c;
+                i++;
+            } else {
+                // delay - this delay introduces the 'tricky' part in the test
+                // do not modify it!
+                volatile int j;
+                for (j=0; j < 10000; j++) {
+                    ;
+                }
+            }
+        }
+        // after receiving 10kB of data, send out the checksum
+        USART_WriteData(&checksum, sizeof(checksum));
+    }
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -110,11 +147,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  /* USER CODE BEGIN 2 */
-
-
 
   /* USER CODE BEGIN 2 */
+  // ========================================================================= STRES TESTY USART
+  //USART_StressTest();
+  /* USER CODE END 2 */
 
   // Initialize event manager
   EVENT_MANAGER_Init();
@@ -126,12 +163,22 @@ int main(void)
   EVENT_MANAGER_ScheduleEvent(&ledGreenEvent, msGetTicks());
 
 
+  USART_StressTest();
 
-
-  //TESTY DLA USART:
+  //TESTY DLA USART
   USART_Init();
   USART_PutChar('O');
   USART_PutChar('K');
+  USART_WriteString("Hello world\n\r");
+  char testData[] = "t";
+  USART_WriteData(testData,1);
+
+  while (1) {
+      char buf[50];
+      msDelay(3000);
+      size_t count = USART_ReadData(buf, sizeof(buf));
+      USART_WriteData(buf, count);
+  }
 
 
   /* USER CODE END 2 */

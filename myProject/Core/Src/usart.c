@@ -23,30 +23,61 @@ static char RingBufferData_Rx[1024];
 
 bool USART_PutChar(char c){
 	//TODO
-	return false;
+    // Zapisanie znaku do bufora
+	__disable_irq();
+	bool result = RingBuffer_PutChar(&USART_RingBuffer_Tx, c);
+	__enable_irq();
+	if (result) {
+	    // Włączenie przerwania, wysłanie buforu gdy bedzie gotwy
+	    LL_USART_EnableIT_TXE(USART1);
+    }
+
+	return result;
 }
 
 
 size_t USART_WriteData(const void *data, size_t dataSize){
 	// TODO
-	return 0;
+	size_t count = 0;
+	const char *charData = (const char*)data;
+
+	// Wysyłanie każdego znaku
+	for (size_t i = 0; i < dataSize; i++) {
+		if (!USART_PutChar(charData[i])) {
+			break; // Błąd wysyłania
+		}
+		count++;
+	}
+
+	return count;
 }
 
 
 size_t USART_WriteString(const char *string){
 	//TODO
-	return 0;
+	return USART_WriteData(string, strlen(string));
 }
 
 
 bool USART_GetChar(char *c){
 	//TODO
-	return false;
+	__disable_irq();
+	bool result = RingBuffer_GetChar(&USART_RingBuffer_Rx, c);
+	__enable_irq();
+	return result;
 }
 
 
 size_t USART_ReadData(void *data, size_t maxSize){
 	// TODO
+    size_t count = 0;
+    char *charData = (char*)data;
+
+    // Odczytywanie po kolei
+    while (count < maxSize && RingBuffer_GetChar(&USART_RingBuffer_Rx, &charData[count])) {
+        count++;
+    }
+    return count;
 	return 0;
 }
 
@@ -57,10 +88,24 @@ void USART1_IRQHandler(void){
 		// The TXE interrupt has occurred
 		// TODO: get a character from the transmit ring buffer and send it via UART
 		//       if no characters are left to send - disable the TXT interrupt source
-	}
+        char c;
+        // Pobranie z bufora
+        if (RingBuffer_GetChar(&USART_RingBuffer_Tx, &c)) {
+            // Wyslanie
+            LL_USART_TransmitData8(USART1, c);
+        } else if (RingBuffer_IsEmpty(&USART_RingBuffer_Tx) == true){
+            // Wylaczenie dla pustego
+            LL_USART_DisableIT_TXE(USART1);
+        }
+    }
 	if (LL_USART_IsActiveFlag_RXNE(USART1)) {
 		// the RXNE interrupt has occurred
 		// TODO: read the received character and place it in the receive ring buffer
+	    // Odczytane dane
+	    uint8_t received = LL_USART_ReceiveData8(USART1);
+	    // Zapisuje dane do bufora
+	    RingBuffer_PutChar(&USART_RingBuffer_Rx, received);
+
 	}
 }
 
