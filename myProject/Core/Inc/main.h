@@ -28,6 +28,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+
 #include "stm32f4xx_ll_usart.h"
 #include "stm32f4xx_ll_rcc.h"
 #include "stm32f4xx_ll_bus.h"
@@ -68,6 +69,9 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BUTTON_Pin GPIO_PIN_2
+#define BUTTON_GPIO_Port GPIOG
+#define BUTTON_EXTI_IRQn EXTI2_IRQn
 #define LED_GREEN_Pin GPIO_PIN_13
 #define LED_GREEN_GPIO_Port GPIOG
 #define LED_RED_Pin GPIO_PIN_14
